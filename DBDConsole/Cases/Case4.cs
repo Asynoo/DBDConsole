@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 
 namespace DBDConsole.Cases;
 
@@ -7,10 +8,10 @@ public class Case4
     public static void Run(SqlConnection connection)
     {
         Console.WriteLine("Please enter department number:");
-        int departmentNumber4 = int.Parse(Console.ReadLine());
+        var departmentNumber4 = int.Parse(Console.ReadLine());
 
-        SqlCommand command4 = new SqlCommand("USP_DeleteDepartment", connection);
-        command4.CommandType = System.Data.CommandType.StoredProcedure;
+        var command4 = new SqlCommand("USP_DeleteDepartment", connection);
+        command4.CommandType = CommandType.StoredProcedure;
         command4.Parameters.AddWithValue("@DNumber", departmentNumber4);
 
         connection.Open();

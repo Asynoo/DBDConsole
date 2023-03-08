@@ -1,13 +1,12 @@
-﻿using System.Data.SqlClient;
-using DBDConsole;
+﻿using DBDConsole;
 using DBDConsole.Cases;
 
 internal class Program
 {
     private static void Main(string[] args)
     {
-        SqlConnection connection = Database.GetConnection();
-        
+        var connection = Database.GetConnection();
+
         while (true)
         {
             var choice = MenuPrinter.Show();
@@ -43,11 +42,10 @@ internal class Program
                     Console.Clear();
                     Case6.Run(connection);
                     break;
-                
+
                 case 0:
                     Console.WriteLine("Goodbye!");
                     return;
-                
             }
         }
     }
