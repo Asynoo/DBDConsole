@@ -4,7 +4,7 @@ public class MenuPrinter
 {
     public static int Show()
     {
-        Console.WriteLine("Please Choose an Excersise!: \n ");
+        Console.WriteLine("\n Please Choose an Excersise!: \n ");
         Console.WriteLine("1. Create a Department");
         Console.WriteLine("2. Update a Department Name");
         Console.WriteLine("3. Update a Department Manager");
