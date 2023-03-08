@@ -7,7 +7,7 @@ public class Case5
 {
     public static void Run(SqlConnection connection)
     {
-        // Retrieve a list of departments from the database
+        
         List<(int DNumber, string DName)> departments = new();
 
         var deptCommand = new SqlCommand("SELECT DNumber, DName FROM Department", connection);
@@ -26,12 +26,10 @@ public class Case5
         deptReader.Close();
         deptCommand.Connection.Close();
 
-        // Display the list of departments to the user
         Console.WriteLine("Departments:");
 
         foreach (var dept in departments) Console.WriteLine($"  {dept.DNumber} - {dept.DName}");
 
-        // Prompt the user to select a department
         int departmentNumber;
 
         while (true)
@@ -48,7 +46,6 @@ public class Case5
                 break;
         }
 
-        // Call the stored procedure with the selected department number
         var command = new SqlCommand("USP_GetDepartment", connection);
         command.CommandType = CommandType.StoredProcedure;
 

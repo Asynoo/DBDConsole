@@ -17,19 +17,19 @@ public class Case6
         if (reader.HasRows)
             while (reader.Read())
             {
-                var dNumber = (int)reader["DNumber"];
-                var dName = (string)reader["DName"];
-                var mgrSSN = (decimal)reader["MgrSSN"];
-                var mgrStartDate = (DateTime)reader["MgrStartDate"];
-                var empCount = (int)reader["EmpCount"];
-
-                // Do something with the results
+                int dNumber = (int)reader["DNumber"];
+                string dName = (string)reader["DName"];
+                decimal mgrSSN = (decimal)reader["MgrSSN"];
+                DateTime mgrStartDate = (DateTime)reader["MgrStartDate"];
+                int empCount = (int)reader["EmpCount"];
+                
                 Console.WriteLine($"Department Number: {dNumber}");
                 Console.WriteLine($"Department Name: {dName}");
                 Console.WriteLine($"Manager SSN: {mgrSSN}");
                 Console.WriteLine($"Manager Start Date: {mgrStartDate}");
                 Console.WriteLine($"Employee Count: {empCount} \n ");
             }
+
         else
             Console.WriteLine("No departments found.");
 

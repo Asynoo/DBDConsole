@@ -1,45 +1,65 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 
-namespace DBDConsole.Cases;
-
-public class Case3
+namespace DBDConsole.Cases
 {
-    public static void Run(SqlConnection connection)
+    public class Case3
     {
-        Console.WriteLine("Please enter department number:");
-        var departmentNumber3 = int.Parse(Console.ReadLine());
+        public static void Run(SqlConnection connection)
+        {
+            Console.WriteLine("Please select a department:");
+            
+            var command = new SqlCommand("SELECT DNumber, DName FROM Department", connection);
 
-        var commandA =
-            new SqlCommand(
-                "SELECT SSN, Fname, Lname FROM Employee WHERE Dno = @DNumber AND SSN NOT IN (SELECT MgrSSN FROM Department WHERE DNumber != @DNumber)",
-                connection);
-        commandA.Parameters.AddWithValue("@DNumber", departmentNumber3);
+            connection.Open();
+            var reader = command.ExecuteReader();
 
-        connection.Open();
-        var reader = commandA.ExecuteReader();
+            Console.WriteLine("Departments:");
+            Console.WriteLine("------------");
 
-        // Display unassigned managers in console
-        Console.WriteLine("Unassigned Managers:");
-        Console.WriteLine("-------------------");
-        while (reader.Read()) Console.WriteLine($"{reader["SSN"]}: {reader["Fname"]} {reader["Lname"]}");
+            while (reader.Read())
+            {
+                Console.WriteLine($"{reader["DNumber"]}: {reader["DName"]}");
+            }
 
-        reader.Close();
-        connection.Close();
+            reader.Close();
 
-        Console.WriteLine("Please enter new manager SSN:");
-        var newManagerSSN3 = int.Parse(Console.ReadLine());
+            Console.Write("Department number: ");
+            var departmentNumber = int.Parse(Console.ReadLine());
 
-        // Execute stored procedure to update department manager
-        var commandB = new SqlCommand("USP_UpdateDepartmentManager", connection);
-        commandB.CommandType = CommandType.StoredProcedure;
-        commandB.Parameters.AddWithValue("@DNumber", departmentNumber3);
-        commandB.Parameters.AddWithValue("@MgrSSN", newManagerSSN3);
+            var commandA = new SqlCommand("SELECT SSN, Fname, Lname FROM Employee WHERE Dno = @DNumber AND SSN NOT IN (SELECT MgrSSN FROM Department WHERE DNumber != @DNumber)", connection);
+            commandA.Parameters.AddWithValue("@DNumber", departmentNumber);
 
-        connection.Open();
-        commandB.ExecuteNonQuery();
-        connection.Close();
+            reader = commandA.ExecuteReader();
 
-        Console.WriteLine("Department manager updated successfully.");
+            Console.WriteLine("Unassigned Managers:");
+            Console.WriteLine("-------------------");
+
+            while (reader.Read())
+            {
+                Console.WriteLine($"{reader["SSN"]}: {reader["Fname"]} {reader["Lname"]}");
+            }
+
+            reader.Close();
+
+            Console.Write("New manager SSN: ");
+            var newManagerSSN = int.Parse(Console.ReadLine());
+
+            var commandB = new SqlCommand("USP_UpdateDepartmentManager", connection);
+            commandB.CommandType = CommandType.StoredProcedure;
+            commandB.Parameters.AddWithValue("@DNumber", departmentNumber);
+            commandB.Parameters.AddWithValue("@MgrSSN", newManagerSSN);
+
+            if (connection.State == ConnectionState.Closed)
+            {
+                connection.Open();
+            }
+
+            commandB.ExecuteNonQuery();
+            connection.Close();
+
+            Console.WriteLine("Department manager updated successfully.");
+        }
     }
 }
