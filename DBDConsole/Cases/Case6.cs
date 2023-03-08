@@ -1,24 +1,45 @@
-﻿using System.Data.SqlClient;
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
 
-namespace DBDConsole.Cases;
-
-public class Case6
+namespace DBDConsole.Cases
 {
-    public static void Run(SqlConnection connection)
+    public class Case6
     {
-        SqlCommand command6 = new SqlCommand("USP_GetALLDepartments", connection);
-        command6.CommandType = System.Data.CommandType.StoredProcedure;
-
-        connection.Open();
-        SqlDataReader reader6 = command6.ExecuteReader();
-
-        Console.WriteLine("{0,-10} {1,-20} {2,-10} {3,-20} {4,-10}", "DNumber", "DName", "MgrSSN", "MgrStartDate", "EmpCount");
-
-        while (reader6.Read())
+        public static void Run(SqlConnection connection)
         {
-            Console.WriteLine("{0,-10} {1,-20} {2,-10} {3,-20} {4,-10}", reader6["DNumber"], reader6["DName"], reader6["MgrSSN"], reader6["MgrStartDate"], reader6["EmpCount"]);
-        }
+            SqlCommand command = new SqlCommand("USP_GetALLDepartments", connection);
+            command.CommandType = CommandType.StoredProcedure;
 
-        connection.Close();
+            command.Connection.Open();
+
+            SqlDataReader reader = command.ExecuteReader();
+
+            if (reader.HasRows)
+            {
+                while (reader.Read())
+                {
+                    int dNumber = (int)reader["DNumber"];
+                    string dName = (string)reader["DName"];
+                    decimal mgrSSN = (decimal)reader["MgrSSN"];
+                    DateTime mgrStartDate = (DateTime)reader["MgrStartDate"];
+                    int empCount = (int)reader["EmpCount"];
+
+                    // Do something with the results
+                    Console.WriteLine($"Department Number: {dNumber}");
+                    Console.WriteLine($"Department Name: {dName}");
+                    Console.WriteLine($"Manager SSN: {mgrSSN}");
+                    Console.WriteLine($"Manager Start Date: {mgrStartDate}");
+                    Console.WriteLine($"Employee Count: {empCount} \n ");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No departments found.");
+            }
+
+            reader.Close();
+            command.Connection.Close();
+        }
     }
 }
