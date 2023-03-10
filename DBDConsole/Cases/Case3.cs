@@ -9,12 +9,10 @@ namespace DBDConsole.Cases
         public static void Run(SqlConnection connection)
         {
             Console.WriteLine("Please select a department:");
-            
             var command = new SqlCommand("SELECT DNumber, DName FROM Department", connection);
 
             connection.Open();
             var reader = command.ExecuteReader();
-
             Console.WriteLine("Departments:");
             Console.WriteLine("------------");
 
@@ -28,15 +26,14 @@ namespace DBDConsole.Cases
             Console.Write("Department number: ");
             var departmentNumber = int.Parse(Console.ReadLine());
 
-            var commandA = new SqlCommand("SELECT SSN, Fname, Lname FROM Employee WHERE Dno = @DNumber AND SSN NOT IN (SELECT MgrSSN FROM Department WHERE DNumber != @DNumber)", connection);
+            var commandA = new SqlCommand("SELECT SSN, Fname, Lname FROM Employee WHERE SSN NOT IN (SELECT MgrSSN FROM Department)", connection);
             commandA.Parameters.AddWithValue("@DNumber", departmentNumber);
 
-            reader = commandA.ExecuteReader();
+                reader = commandA.ExecuteReader();
+                Console.WriteLine("\n Unassigned Managers:");
+                Console.WriteLine("---------------------------");
 
-            Console.WriteLine("Unassigned Managers:");
-            Console.WriteLine("-------------------");
-
-            while (reader.Read())
+                while (reader.Read())
             {
                 Console.WriteLine($"{reader["SSN"]}: {reader["Fname"]} {reader["Lname"]}");
             }
@@ -47,19 +44,14 @@ namespace DBDConsole.Cases
             var newManagerSSN = int.Parse(Console.ReadLine());
 
             var commandB = new SqlCommand("USP_UpdateDepartmentManager", connection);
-            commandB.CommandType = CommandType.StoredProcedure;
+            commandB.CommandType = System.Data.CommandType.StoredProcedure;
             commandB.Parameters.AddWithValue("@DNumber", departmentNumber);
             commandB.Parameters.AddWithValue("@MgrSSN", newManagerSSN);
-
-            if (connection.State == ConnectionState.Closed)
-            {
-                connection.Open();
-            }
-
             commandB.ExecuteNonQuery();
-            connection.Close();
 
             Console.WriteLine("Department manager updated successfully.");
+                
+            connection.Close();
         }
     }
 }

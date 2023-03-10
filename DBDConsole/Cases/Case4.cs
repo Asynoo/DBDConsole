@@ -1,23 +1,25 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 
-namespace DBDConsole.Cases;
-
-public class Case4
+namespace DBDConsole.Cases
 {
-    public static void Run(SqlConnection connection)
+    public class Case4
     {
-        Console.WriteLine("Please enter department number:");
-        var departmentNumber4 = int.Parse(Console.ReadLine());
+        public static void Run(SqlConnection connection)
+        {
+            Console.Write("Please enter department number: ");
+            int departmentNumber = int.Parse(Console.ReadLine());
 
-        var command4 = new SqlCommand("USP_DeleteDepartment", connection);
-        command4.CommandType = CommandType.StoredProcedure;
-        command4.Parameters.AddWithValue("@DNumber", departmentNumber4);
+            var deleteDepartmentCommand = new SqlCommand("USP_DeleteDepartment", connection);
+            deleteDepartmentCommand.CommandType = CommandType.StoredProcedure;
+            deleteDepartmentCommand.Parameters.AddWithValue("@DNumber", departmentNumber);
 
-        connection.Open();
-        command4.ExecuteNonQuery();
-        connection.Close();
+            connection.Open();
+            deleteDepartmentCommand.ExecuteNonQuery();
+            connection.Close();
 
-        Console.WriteLine("Department deleted successfully.");
+            Console.WriteLine("Department deleted successfully.");
+        }
     }
 }

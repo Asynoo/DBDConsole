@@ -1,33 +1,41 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace DBDConsole.Cases;
-
-public class Case2
+namespace DBDConsole.Cases
 {
-    public static void Run(SqlConnection connection)
+    public class Case2
     {
-        Console.WriteLine("Please choose a department number:");
-        var command1 = new SqlCommand("SELECT DNumber, DName FROM Department", connection);
-        connection.Open();
-        var readerA = command1.ExecuteReader();
-        while (readerA.Read()) Console.WriteLine($"{readerA["DNumber"]}: {readerA["DName"]}");
-        readerA.Close();
-        connection.Close();
+        public static void Run(SqlConnection connection)
+        {
+            Console.WriteLine("Please choose a department number:");
+            var selectDepartmentsCommand = new SqlCommand("SELECT DNumber, DName FROM Department", connection);
 
-        var departmentNumber2 = int.Parse(Console.ReadLine());
-        Console.WriteLine("Please enter new department name:");
-        var newDepartmentName2 = Console.ReadLine();
+            connection.Open();
+            using (var reader = selectDepartmentsCommand.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    Console.WriteLine($"{reader["DNumber"]}: {reader["DName"]}");
+                }
+            }
+            connection.Close();
 
-        var command2 = new SqlCommand("USP_UpdateDepartmentName", connection);
-        command2.CommandType = CommandType.StoredProcedure;
-        command2.Parameters.AddWithValue("@DNumber", departmentNumber2);
-        command2.Parameters.AddWithValue("@DName", newDepartmentName2);
+            Console.WriteLine("Please enter the department number:");
+            int departmentNumber = int.Parse(Console.ReadLine());
 
-        connection.Open();
-        command2.ExecuteNonQuery();
-        connection.Close();
+            Console.WriteLine("Please enter new department name:");
+            string newDepartmentName = Console.ReadLine();
 
-        Console.WriteLine("Department updated successfully.");
+            var updateDepartmentCommand = new SqlCommand("USP_UpdateDepartmentName", connection);
+            updateDepartmentCommand.CommandType = CommandType.StoredProcedure;
+            updateDepartmentCommand.Parameters.AddWithValue("@DNumber", departmentNumber);
+            updateDepartmentCommand.Parameters.AddWithValue("@DName", newDepartmentName);
+
+            connection.Open();
+            updateDepartmentCommand.ExecuteNonQuery();
+            connection.Close();
+
+            Console.WriteLine("Department updated successfully.");
+        }
     }
 }

@@ -1,52 +1,44 @@
 ﻿using System.Data;
 using System.Data.SqlClient;
 
-namespace DBDConsole.Cases;
-
-public class Case1
+namespace DBDConsole.Cases
 {
-    public static void Run(SqlConnection connection)
+    public class Case1
     {
-        Console.WriteLine("Please enter department name:");
-        var departmentName = Console.ReadLine();
-        var managerSSN = 0;
-        var validManagerSSN = false;
-
-        while (!validManagerSSN)
+        public static void Run(SqlConnection connection)
         {
-            Console.WriteLine("Please enter manager SSN:");
-            var input = Console.ReadLine();
+            Console.WriteLine("Please enter department name:");
+            string departmentName = Console.ReadLine();
 
-            if (!int.TryParse(input, out managerSSN))
+            int managerSSN;
+            while (true)
             {
-                Console.WriteLine("Invalid SSN. Please enter a valid integer SSN.");
-            }
-            else
-            {
-                var checkManagerSSNCommand =
-                    new SqlCommand("SELECT COUNT(*) FROM Employee WHERE SSN = @SSN", connection);
-                checkManagerSSNCommand.Parameters.AddWithValue("@SSN", managerSSN);
+                Console.WriteLine("Please enter manager SSN:");
+                if (int.TryParse(Console.ReadLine(), out managerSSN))
+                {
+                    var checkManagerSSNCommand = new SqlCommand("SELECT COUNT(*) FROM Employee WHERE SSN = @SSN", connection);
+                    checkManagerSSNCommand.Parameters.AddWithValue("@SSN", managerSSN);
 
-                connection.Open();
-                var count = Convert.ToInt32(checkManagerSSNCommand.ExecuteScalar());
-                connection.Close();
+                    connection.Open();
+                    int count = (int)checkManagerSSNCommand.ExecuteScalar();
+                    connection.Close();
 
-                if (count > 0)
-                    validManagerSSN = true;
-                else
-                    Console.WriteLine($"Manager SSN {managerSSN} does not exist. Please enter a valid manager SSN.");
+                    if (count > 0) break;
+                }
+
+                Console.WriteLine($"Invalid manager SSN. Please enter a valid integer SSN.");
             }
+
+            var createDepartmentCommand = new SqlCommand("USP_CreateDepartment", connection);
+            createDepartmentCommand.CommandType = CommandType.StoredProcedure;
+            createDepartmentCommand.Parameters.AddWithValue("@DName", departmentName);
+            createDepartmentCommand.Parameters.AddWithValue("@MgrSSN", managerSSN);
+
+            connection.Open();
+            createDepartmentCommand.ExecuteNonQuery();
+            connection.Close();
+
+            Console.WriteLine("Department created successfully.");
         }
-
-        var createDepartmentCommand = new SqlCommand("USP_CreateDepartment", connection);
-        createDepartmentCommand.CommandType = CommandType.StoredProcedure;
-        createDepartmentCommand.Parameters.AddWithValue("@DName", departmentName);
-        createDepartmentCommand.Parameters.AddWithValue("@MgrSSN", managerSSN);
-
-        connection.Open();
-        createDepartmentCommand.ExecuteNonQuery();
-        connection.Close();
-
-        Console.WriteLine("Department created successfully.");
     }
 }
